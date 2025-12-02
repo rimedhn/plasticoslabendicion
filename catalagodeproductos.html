@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Productos</title>
+    <link rel="icon" href="https://github.com/rimedhn/plasticoslabendicion/blob/main/Logo%20Inversiones%20La%20Bendicion.jpeg?raw=true" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e0e0e0;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        html {
+            scrollbar-width: thin;
+            scrollbar-color: #888 #e0e0e0;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+<header class="bg-white shadow-md py-6 mb-8">
+    <div class="container mx-auto px-4 md:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center">
+            <img src="https://github.com/rimedhn/plasticoslabendicion/blob/main/Logo%20Inversiones%20La%20Bendicion.jpeg?raw=true" alt="Logotipo" class="h-16 w-16 mr-4 rounded-full shadow-sm">
+            <div>
+                <h1 class="text-3xl font-extrabold text-gray-800">INVERSIONES LA BENDICION</h1>
+                <p class="text-gray-600">¡Bienvenido a nuestro catálogo en línea!</p>
+            </div>
+        </div>
+    </div>
+</header>
+
+<section class="mb-8">
+    <div class="relative w-full overflow-hidden" style="padding-top: 25%;">
+        <img src="https://github.com/rimedhn/plasticoslabendicion/blob/main/Banner%20catalago%20en%20linea.png?raw=true" alt="Banner" class="absolute top-0 left-0 w-full h-full object-contain">
+    </div>
+</section>
+
+<div class="container mx-auto py-4 px-6 md:px-8 flex-grow">
+    <h1 class="text-4xl font-extrabold text-center text-gray-800 mb-8 mt-4">🛍️ Catálogo de Productos</h1>
+    <div class="mb-8 p-4 bg-white rounded-lg shadow-md flex flex-wrap items-center justify-center gap-4 text-center font-bold text-blue-600">
+        Consulta nuestros productos disponibles.
+    </div>
+    <div class="flex flex-col lg:flex-row gap-6">
+        <aside class="lg:w-1/4 bg-white p-6 rounded-lg shadow-lg h-fit lg:sticky lg:top-8">
+            <h2 class="text-2xl font-bold text-gray-700 mb-4">Categorías</h2>
+            <div id="categoryFilters" class="w-full">
+                <select id="categorySelect" class="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="Todos">Todas las Categorías</option>
+                </select>
+            </div>
+            <div class="mb-4 mt-4">
+                <input type="text" id="searchBar" placeholder="Buscar productos..." class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+            </div>
+        </aside>
+        <main class="lg:w-3/4">
+            <div id="productGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+                <p class="text-center text-gray-600 col-span-full">Cargando productos...</p>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- SOLO SE MANTIENE el botón flotante de WhatsApp -->
+<a href="#" target="_blank" id="whatsappFloatingButton" class="fixed bottom-5 right-5 bg-green-300 text-white p-2 rounded-full shadow-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 z-50">
+    <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 58 58" xmlns="http://www.w3.org/2000/svg">
+        <path style="fill:#2CB742;" d="M0,58l4.988-14.963C2.457,38.78,1,33.812,1,28.5C1,12.76,13.76,0,29.5,0S58,12.76,58,28.5 S45.24,57,29.5,57c-4.789,0-9.299-1.187-13.26-3.273L0,58z"></path>
+        <path style="fill:#FFFFFF;" d="M47.683,37.985c-1.316-2.487-6.169-5.331-6.169-5.331c-1.098-0.626-2.423-0.696-3.049,0.42 c0,0-1.577,1.891-1.978,2.163c-1.832,1.241-3.529,1.193-5.242-0.52l-3.9[...]"/>
+    </svg>
+</a>
+
+<script>
+const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTvOhf_J1mh__Hxa9kXpGUubb_U1b2HG8eKCSo9R7ecn84LaITA69_llGe3ZAf6pOqOoSsJ2iv2J9pX/pub?gid=782954701&single=true&output=csv';
+const WHATSAPP_NUMBER = '50498783851'; // REEMPLAZA este número si lo necesitas
+
+// Configuración del link del botón flotante de WhatsApp
+const whatsappFloatingButton = document.getElementById('whatsappFloatingButton');
+const initialWhatsappMessage = encodeURIComponent("¡Hola! Vengo de tu catálogo de productos y me gustaría comunicarme con un asesor de ventas.");
+
+if (whatsappFloatingButton) {
+    whatsappFloatingButton.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${initialWhatsappMessage}`;
+}
+
+let allProducts = [];
+let categories = new Set();
+
+const searchBar = document.getElementById('searchBar');
+
+/**
+ * Carga productos del Google Sheet publicado, filtra activos, extrae categorías y renderiza la vista.
+ */
+async function loadProducts() {
+    try {
+        const response = await fetch(GOOGLE_SHEETS_CSV_URL);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const csvText = await response.text();
+        const lines = csvText.split('\n').filter(line => line.trim() !== '');
+        if (lines.length < 2) {
+            document.getElementById('productGrid').innerHTML = 
+                '<p class="text-center text-gray-600 col-span-full">No hay productos disponibles.</p>';
+            return;
+        }
+        const headers = lines[0].split(',').map(header => header.trim());
+        const headerMap = {
+            'ID': 'id',
+            'Nombre Producto': 'name',
+            'Descripción': 'description',
+            'Precio': 'price',
+            'Categoría': 'category',
+            'Imagen URL': 'imageUrl',
+            'Estado': 'status'
+        };
+
+        allProducts = lines.slice(1).map(line => {
+            const values = line.split(',');
+            let product = {};
+            headers.forEach((header, index) => {
+                const propName = headerMap[header] || header.toLowerCase().replace(/\s/g, '');
+                product[propName] = values[index] ? values[index].trim() : '';
+            });
+            product.price = parseFloat(product.price || 0);
+            return product;
+        }).filter(product => product.status && product.status.toLowerCase() === 'activo');
+        categories.clear();
+        allProducts.forEach(product => { if (product.category) categories.add(product.category); });
+        populateCategorySelect();
+        renderProducts('Todos');
+    } catch (error) {
+        document.getElementById('productGrid').innerHTML = 
+            '<p class="text-center text-red-500 col-span-full">Error al cargar los productos.</p>';
+    }
+}
+
+function populateCategorySelect() {
+    const categorySelect = document.getElementById('categorySelect');
+    categorySelect.innerHTML = '<option value="Todos">Todas las Categorías</option>';
+    Array.from(categories).sort().forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        categorySelect.appendChild(option);
+    });
+}
+
+function renderProducts(filterCategory) {
+    const productGrid = document.getElementById('productGrid');
+    productGrid.innerHTML = '';
+    let productsToProcess = filterCategory === 'Todos'
+        ? allProducts
+        : allProducts.filter(product => product.category === filterCategory);
+
+    const searchTerm = searchBar.value.toLowerCase();
+    let finalProductsToDisplay = productsToProcess.filter(product => {
+        return product.name.toLowerCase().includes(searchTerm)
+            || product.description.toLowerCase().includes(searchTerm)
+            || (product.category && product.category.toLowerCase().includes(searchTerm))
+            || (product.id && product.id.toLowerCase().includes(searchTerm));
+    });
+
+    if (finalProductsToDisplay.length === 0) {
+        productGrid.innerHTML = 
+            '<p class="text-center text-gray-600 col-span-full">No se encontraron productos que coincidan con los filtros aplicados.</p>';
+        return;
+    }
+
+    // Agrupar y mostrar por categoría si es "Todos"
+    if (filterCategory === 'Todos') {
+        const groupedProducts = {};
+        finalProductsToDisplay.forEach(product => {
+            if (!groupedProducts[product.category]) {
+                groupedProducts[product.category] = [];
+            }
+            groupedProducts[product.category].push(product);
+        });
+
+        Array.from(categories).sort().forEach(category => {
+            if (groupedProducts[category]) {
+                const categoryHeader = document.createElement('h2');
+                categoryHeader.classList.add('col-span-full', 'text-2xl', 'font-bold', 'text-gray-700', 'mt-6', 'mb-4', 'border-b-2', 'border-gray-200', 'pb-2');
+                categoryHeader.textContent = category;
+                productGrid.appendChild(categoryHeader);
+
+                groupedProducts[category].sort((a, b) => a.name.localeCompare(b.name)).forEach(product => {
+                    createProductCard(productGrid, product);
+                });
+            }
+        });
+    } else {
+        finalProductsToDisplay.sort((a, b) => a.name.localeCompare(b.name)).forEach(product => {
+            createProductCard(productGrid, product);
+        });
+    }
+}
+
+// Tarjeta solo con imagen, nombre y descripción
+function createProductCard(container, product) {
+    const productCard = document.createElement('div');
+    productCard.className = 'bg-white rounded-xl shadow-lg overflow-hidden text-center p-2 transition-all duration-300 hover:shadow-xl hover:scale-105 flex flex-col';
+    const imageUrl = product.imageUrl || `https://placehold.co/300x200/e0e0e0/555555?text=${encodeURIComponent(product.name || 'Producto')}`;
+    productCard.innerHTML = `
+        <img src="${imageUrl}" alt="${product.name}" class="w-full h-40 object-contain rounded-md mb-2"
+            onerror="this.onerror=null;this.src='https://placehold.co/300x200/e0e0e0/555555?text=Imagen+no+disponible';">
+        <h3 class="text-xl font-bold text-gray-800 mb-1 flex-grow">${product.name}</h3>
+        <p class="text-gray-600 text-sm mb-1">${product.description}</p>
+        <!-- Precio y botones eliminados -->
+    `;
+    container.appendChild(productCard);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadProducts();
+    const categorySelect = document.getElementById('categorySelect');
+    if (categorySelect) {
+        categorySelect.addEventListener('change', (event) => {
+            renderProducts(event.target.value);
+        });
+    }
+    if (searchBar) {
+        searchBar.addEventListener('input', () => renderProducts(categorySelect.value));
+    }
+});
+</script>
+
+<footer class="bg-gray-800 text-white py-8 mt-12">
+    <div class="container mx-auto px-4 text-center">
+        <p class="text-sm mb-4">
+            INVERSIONES LA BENDICION. LA CEIBA, ATLANTIDA.  
+            <a href="mailto:jlaquinozapata6@gmail.com" class="text-blue-400 hover:underline"></a> 
+            <a href="tel:+50498783851" class="text-blue-400 hover:underline">+504 9878-3851</a>, <a href="tel:+5049878-3851" class="text-blue-400 hover:underline"></a><br>
+            &copy; 2025. Todos los derechos reservados. Catálogo de productos desarrollado por: Rimed Digital,  
+            <a href="mailto:indime.hn@gmail.com" class="text-blue-400 hover:underline">indime.hn@gmail.com</a>  
+            <a href="tel:+50493593126" class="text-blue-400 hover:underline">+504 9359-3126</a>
+        </p>
+    </div>
+    <div class="flex justify-left space-x-6 ml-5 mb-4">
+        <a href="https://www.facebook.com/[tu_usuario_facebook]" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 transition-colors duration-200">
+            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2[...]"></path>
+            </svg>
+        </a>
+        <a href="https://www.instagram.com/[tu_usuario_instagram]" target="_blank" rel="noopener noreferrer" class="text-pink-400 hover:text-pink-300 transition-colors duration-200">
+            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path fill-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.[...]"></path>
+            </svg>
+        </a>
+        <a href="https://www.tiktok.com/@tu_usuario_tiktok" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-gray-300 transition-colors duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" aria-label="TikTok" role="img" viewBox="0 0 10 10"><rect rx="15%" height="8" width="8" fill="#fff"/><defs><path id="t" d="M219 200a117 117 0 1 0 101 115v-128a150 150 0 0 0 88 28v-63a88 88 0 0 1-88-88h-64v252a54 54 0 1 1-37-51z" style="mix-blend-mode:multiply"/></defs><use href="#t" fill="#010101" xlink:href="#t"/></svg>
+        </a>
+    </div>
+</footer>
+</body>
+</html>
